@@ -1,7 +1,6 @@
 var fs = require('fs')
 
 
-
 fs.writeFile('temp.js', 'console.log("written")', function (err) {
     console.log('File Generated');
 })
@@ -10,7 +9,6 @@ fs.writeFile('temp.js', 'console.log("written")', function (err) {
 fs.readFile('temp.js', 'utf-8', function (err, data) {
     console.log(data)
 });
-
 
 setTimeout(
 

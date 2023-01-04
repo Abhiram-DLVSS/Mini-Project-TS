@@ -46,7 +46,7 @@ test()
 
 //Promises
 const promise = new Promise((resolve, reject) => {
-    if (true) {//some conditin
+    if (true) {//some condition
         resolve();
     }
     else {
