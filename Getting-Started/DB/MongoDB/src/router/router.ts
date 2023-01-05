@@ -19,8 +19,6 @@ router.put("/", (req: express.Request, res: express.Response) => {
     .catch((error) => res.status(500).json({ error }));
 });
 router.get("/", async (req: express.Request, res: express.Response) => {
-
-
   return Author.find()
     .then((authors) =>
       authors
