@@ -1,0 +1,4 @@
+http://localhost:9000/location?city=Hyderabad&country=India
+http://localhost:9000/employee?name=Name&experience=10&location_city=Hyderabad&location_country=India&to_name=ToName
+http://localhost:9000/project?project_id=1&eid=2&project_name=ProjectName
+loc_post>emp_post>project_post>project_put

@@ -30,7 +30,12 @@ AppDataSource.initialize()
 
 router.get("/", async (req: express.Request, res: express.Response) => {
   const userRepo = AppDataSource.getRepository(User);
-
+  const {name} =req.query;
+  // const allRecords = await userRepo.find({
+  //   where:{
+  //     name: name as string
+  //   }
+  // });
   const allRecords = await userRepo.find();
 
   res.status(200).json(allRecords);
@@ -70,16 +75,16 @@ router.delete("/", async (req: express.Request, res: express.Response) => {
   const userRepo = AppDataSource.getRepository(User);
 
   /*Delete One*/
-  await userRepo.delete((deleteid as string) || "");
+  // await userRepo.delete((deleteid as string) || "");
 
   /*Delete all*/
-  // const allRecords =await userRepo.find({
-  //   where:
-  //   {name:name}
-  // })
-  // for(let i=0;i<allRecords.length;i++){
-  //   await userRepo.delete(allRecords[i]?.id||"")
-  // }
+  const allRecords =await userRepo.find({
+    where:
+    {name:name as string}
+  })
+  for(let i=0;i<allRecords.length;i++){
+    await userRepo.delete(allRecords[i]?.id||"")
+  }
 
   res.status(200).json({ Message: "Recorded Deleted" });
 });
