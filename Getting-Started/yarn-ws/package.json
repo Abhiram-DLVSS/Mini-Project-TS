@@ -1,0 +1,16 @@
+{
+  "name": "yarn-ws",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "client": "yarn workspace client start",
+    "server": "yarn workspace server start",
+    "start": "concurrently --kill-others-on-fail \"yarn server\"  \"yarn client\""
+    },
+  "dependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
