@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
-  JoinTable,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from "typeorm";
 import { Employee } from "./Employee";
 
 @Entity()
@@ -15,11 +9,7 @@ export class Project {
   @Column()
   name: string;
 
-  @ManyToMany(() => Employee, {
-    cascade: true,
-    eager: true,
-    onDelete: "CASCADE",
-  })
+  @ManyToMany(() => Employee, { cascade: true, eager: true, onDelete: "CASCADE" })
   @JoinTable()
   employee: Employee[];
 }

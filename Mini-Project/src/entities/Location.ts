@@ -12,10 +12,6 @@ export class Location {
   @Column()
   country: string;
 
-  @OneToMany(
-    () => EmployeeDetails,
-    (employeeDetails) => employeeDetails.location,
-    { onDelete: "CASCADE" }
-  )
+  @OneToMany(() => EmployeeDetails, (employeeDetails) => employeeDetails.location, { onDelete: "CASCADE" })
   employeeDetails: EmployeeDetails[];
 }

@@ -4,7 +4,6 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "typeorm": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli",
     "migration:create": "typeorm migration:create migrations/test",
     "migration:run": "npx typeorm-ts-node-commonjs migration:run -d ormconfig.ts",

@@ -3,222 +3,170 @@ import express from "express";
 import { Employee } from "../entities/Employee";
 import { EmployeeDetails } from "../entities/EmployeeDetails";
 import { Location } from "../entities/Location";
-import dotenv from "dotenv";
-dotenv.config();
+import { Between } from "typeorm";
 
 const empRouter: express.Router = express.Router();
 empRouter.use(express.json());
 empRouter.use(express.urlencoded({ extended: true }));
 
+/* Create an Employee(Name, Experience, City, Country and Salary) */
 empRouter.post("/", async (req: express.Request, res: express.Response) => {
-  const { name, experience, location_city, location_country } = req.query;
+  /* Get the Query Params from Request */
+  const { name, experience, city, country, salary } = req.query;
 
-  let loc: Location = new Location();
-  loc.country = location_country as string;
-  loc.name = location_city as string;
+  /* If any of the params is not defined, Return the corresponding message */
+  if ( name == undefined || experience == undefined || city == undefined || country == undefined || salary == undefined)
+    res.status(400).json("Employee Details are incomplete.");
+  else {
+    /* Create a Location Object with given data */
+    let location: Location = new Location();
+    location.country = country as string;
+    location.name = city as string;
 
-  const locationRepo = req.app.get("appDataSource").getRepository(Location);
-  const dataFetched = await locationRepo.find({
-    where: {
-      name: location_city as string,
-      country: location_country as string,
-    },
-  });
-  // console.log(dataFetched);
-  if (dataFetched.length != 0) {
-    loc.id = dataFetched[0].id;
-  } else {
+    /* Location Table */
     const locationRepo = req.app.get("appDataSource").getRepository(Location);
-    const dataInserted = await locationRepo.save(loc);
-    loc.id = dataInserted.id;
+
+    /* Find all the records in the Location Table with given city and country. */
+    const dataFetched = await locationRepo.find({
+      where: {
+        name: city as string,
+        country: country as string,
+      },
+    });
+    
+    /* If location already exists, assign the location id to prevent TypeORM from creating another location record */
+    if (dataFetched.length != 0) {
+      location.id = dataFetched[0].id;
+    } else {
+      /* Add the object to the DB */
+      const dataInserted = await locationRepo.save(location);
+      /* Assign the added location id to the location.id */
+      location.id = dataInserted.id;
+    }
+
+    /* Employee Details Table */
+    const empdetRepo = req.app .get("appDataSource") .getRepository(EmployeeDetails);
+
+    /* Employee Object */
+    let employee: Employee = new Employee();
+    employee.name = name as string;
+
+    /* Employee Details Object */
+    let employeeDetails: EmployeeDetails = new EmployeeDetails();
+    employeeDetails.experience = Number(experience);
+    employeeDetails.salary = Number(salary);
+    employeeDetails.location = location;
+    employeeDetails.employee = employee;
+
+    /* Add the object to the DB */
+    const dataInserted = await empdetRepo.save(employeeDetails);
+
+    /* Send the inserted record as Response */
+    res.status(200).json(dataInserted);
   }
-
-  const empdetRepo = req.app
-    .get("appDataSource")
-    .getRepository(EmployeeDetails);
-  let employee: Employee = new Employee();
-  employee.name = name as string;
-
-  let employeeDetails: EmployeeDetails = new EmployeeDetails();
-  employeeDetails.experience = experience as string;
-  employeeDetails.location = loc;
-  employeeDetails.employee = employee;
-
-  const dataInserted = await empdetRepo.save(employeeDetails);
-  res.status(200).json(dataInserted);
 });
 
+/* Update an Employee(Name, Experience, City, Country and Salary) */
 empRouter.put("/", async (req: express.Request, res: express.Response) => {
+  /* Get the Query Params from Request */
+  const { eid, change_experience, change_city, change_country, change_salary } = req.query;
+  /* Note: Except eid, every other parameter is optional */
 
-  //Get the EmployeeID
-  const { eid, to_experience, to_location_city, to_location_country } = req.query;
-  //Search for the employee
+  /* Search for the employee */
   const empdetRepo = req.app.get("appDataSource").getRepository(EmployeeDetails);
-  const findEmployee= await empdetRepo.find({
-    where:{
-      id:eid
-    }
+  const findEmployee = await empdetRepo.find({
+    where: {
+      id: eid,
+    },
   });
-  if(findEmployee.length!=0){
-    //Update the relevant information
-    let loc: Location = new Location();
-    if(to_location_city!=undefined||to_location_country!=undefined){
-      loc.country = to_location_country as string;
-      loc.name = to_location_city as string;
+
+  /* If employee with eid exists */
+  if (findEmployee.length != 0) {
+    /* Update the relevant information */
+
+    /* Check if the location to which we are updating exists, if not create it*/
+    let location: Location = new Location();
+    if (change_city != undefined || change_country != undefined) {
+      location.country = change_country as string;
+      location.name = change_city as string;
 
       const locationRepo = req.app.get("appDataSource").getRepository(Location);
       const dataFetched = await locationRepo.find({
         where: {
-          name: to_location_city as string,
-          country: to_location_country as string,
+          name: change_city as string,
+          country: change_country as string,
         },
       });
-      // console.log(dataFetched);
       if (dataFetched.length != 0) {
-        loc.id = dataFetched[0].id;
+        location.id = dataFetched[0].id;
       } else {
         const locationRepo = req.app.get("appDataSource").getRepository(Location);
-        const dataInserted = await locationRepo.save(loc);
-        loc.id = dataInserted.id;
+        const dataInserted = await locationRepo.save(location);
+        location.id = dataInserted.id;
       }
+    } else {
+      location.id = findEmployee[0].location.id;
+      location.name = findEmployee[0].location.name;
+      location.country = findEmployee[0].location.country;
     }
-    else{
-      loc.id=findEmployee[0].location.id;
-      loc.name=findEmployee[0].location.name;
-      loc.country=findEmployee[0].location.country;
-    }
-    
+
+    /* Create Employee object */
     let employee: Employee = new Employee();
     employee.name = findEmployee[0].employee.name;
-    employee.id=findEmployee[0].employee.id;
+    employee.id = findEmployee[0].employee.id;
 
+    /* Create Employee Details object */
     let employeeDetails: EmployeeDetails = new EmployeeDetails();
-    employeeDetails.id=findEmployee[0].id;
-    if(to_experience!=undefined){
-      employeeDetails.experience = to_experience as string;
-    }
-    else{
+    employeeDetails.id = findEmployee[0].id;
+    if (change_experience != undefined) {
+      employeeDetails.experience = Number(change_experience);
+    } else {
       employeeDetails.experience = findEmployee[0].experience;
     }
-    employeeDetails.location = loc;
+    if (change_salary != undefined) {
+      employeeDetails.salary = Number(change_salary);
+    } else {
+      employeeDetails.salary = findEmployee[0].salary;
+    }
+    employeeDetails.location = location;
     employeeDetails.employee = employee;
-    //Insert
+
+    /* Add the object to the DB */
     const dataInserted = await empdetRepo.save(employeeDetails);
+
+    /* Send the updated record as Response */
     res.status(200).json(dataInserted);
-  }
-  else{
+  } else {
     res.status(404).json("Employee with the given ID not found");
   }
 });
 
+/* Get all added employees */
 empRouter.get("/", async (req: express.Request, res: express.Response) => {
-  const empdetRepo = req.app
-    .get("appDataSource")
-    .getRepository(EmployeeDetails);
+  const empdetRepo = req.app .get("appDataSource").getRepository(EmployeeDetails);
   const dataFetched = await empdetRepo.find();
   res.status(200).json(dataFetched);
 });
 
-empRouter.put("/", async (req: express.Request, res: express.Response) => {
-  const {
-    name,
-    experience,
-    location_city,
-    location_country,
-    to_name,
-    to_experience,
-    to_location_city,
-    to_location_country,
-  } = req.query;
-
-  //Find the employee first
-  const empdetRepo = req.app
-    .get("appDataSource")
-    .getRepository(EmployeeDetails);
-
-  let employee: Employee = new Employee();
-  employee.name = name as string;
-
-  let loc: Location = new Location();
-  loc.country = location_country as string;
-  loc.name = location_city as string;
-
-  let employeeDetails: EmployeeDetails = new EmployeeDetails();
-  employeeDetails.experience = experience as string;
-  employeeDetails.location = loc;
-  employeeDetails.employee = employee;
-
-  const FoundRecord = await empdetRepo.findOne({
-    where: {
-      experience: experience as string,
-      employee: employee,
-      location: loc,
-    },
-  });
-
-  if (FoundRecord) {
-    // console.log(FoundRecord);
-    //Check if the location it is getting updated to exists or not, if not add
-    const locationRepo = req.app.get("appDataSource").getRepository(Location);
-    const locFetched = await locationRepo.find({
+/* Get all added employees whose salary is in between the specified range*/
+empRouter.get("/salary", async (req: express.Request, res: express.Response) => {
+    const { lower_bound, upper_bound } = req.query;
+    const empdetRepo = req.app.get("appDataSource").getRepository(EmployeeDetails);
+    const dataFetched = await empdetRepo.find({
       where: {
-        name: location_city as string,
-        country: location_country as string,
+        salary: Between(lower_bound, upper_bound),
       },
     });
-    // console.log(locFetched);
-    if (locFetched.length != 0) {
-      loc.id = locFetched[0].id;
-    } else {
-      const locationRepo = req.app.get("appDataSource").getRepository(Location);
-      const locInserted = await locationRepo.save(loc);
-      loc.id = locInserted.id;
-    }
-    //Update
-    if (to_name) employee.name = to_name as string;
-
-    employee.id = FoundRecord.employee.id;
-
-    if (to_location_country) loc.country = to_location_country as string;
-    if (to_location_city) loc.name = to_location_city as string;
-
-    if (to_experience) employeeDetails.experience = to_experience as string;
-    employeeDetails.location = loc;
-    employeeDetails.employee = employee;
-    employeeDetails.id = FoundRecord.id;
-    //Save
-    const dataUpdated = await empdetRepo.save(employeeDetails);
-    res.status(200).json(dataUpdated);
-  } else {
-    res.status(200).json("The record requested to update is not found.");
+    res.status(200).json(dataFetched);
   }
-});
+);
 
+/* Delete an Employee */
 empRouter.delete("/", async (req: express.Request, res: express.Response) => {
-  const { name, experience, location_city, location_country } = req.query;
-  const empdetRepo = req.app
-    .get("appDataSource")
-    .getRepository(EmployeeDetails);
+  const { eid } = req.query;
   const empRepo = req.app.get("appDataSource").getRepository(Employee);
-
-  let employee: Employee = new Employee();
-  employee.name = name as string;
-
-  let loc: Location = new Location();
-  loc.country = location_country as string;
-  loc.name = location_city as string;
-
-  const allRecords = await empdetRepo.find({
-    where: {
-      experience: experience as string,
-      employee: employee,
-      location: loc,
-    },
-  });
-
-  for (let i = 0; i < allRecords.length; i++) {
-    await empRepo.delete(allRecords[i]?.employee.id || "");
-  }
+  await empRepo.delete(eid);
   res.status(200).json("Record Deleted");
 });
+
 export default empRouter;

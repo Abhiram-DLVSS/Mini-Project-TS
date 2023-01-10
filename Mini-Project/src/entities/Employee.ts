@@ -7,7 +7,4 @@ export class Employee {
 
   @Column()
   name: string;
-
-  @Column()
-  gender: string;
 }
