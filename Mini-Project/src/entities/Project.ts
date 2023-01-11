@@ -6,7 +6,7 @@ export class Project {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @ManyToMany(() => Employee, { cascade: true, eager: true, onDelete: "CASCADE" })

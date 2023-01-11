@@ -10,8 +10,11 @@ export class EmployeeDetails {
   @Column({ default : 0})
   experience: number;
 
-  @Column({ default: 0 })
+  @Column({type:"decimal", precision: 12, scale: 2, default: 0})
   salary: number;
+
+  @Column({ length: 10})
+  phno: string;
 
   @CreateDateColumn()
   created_at: Date;
