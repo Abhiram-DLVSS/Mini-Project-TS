@@ -18,8 +18,7 @@ projectRouter.post("/", async (req: express.Request, res: express.Response) => {
     const dataInserted = await projectRepo.save(project);
     res.status(200).json(dataInserted);
   } catch (error: any) {
-    res
-      .status(400)
+    res.status(400)
       .json("A project with the same name already exists. Try something else.");
   }
 });
@@ -44,7 +43,10 @@ projectRouter.get(
           id: id,
         },
       });
-      res.status(200).json(dataFetched);
+      if(dataFetched.length==0)
+        res.status(200).json("Project not found");
+      else
+        res.status(200).json(dataFetched);
     } catch (error: any) {
       res.status(400).json(error.originalError.message);
     }
@@ -62,7 +64,10 @@ projectRouter.get(
           name: name,
         },
       });
-      res.status(200).json(dataFetched);
+      if(dataFetched.length==0)
+        res.status(200).json("Project not found");
+      else
+        res.status(200).json(dataFetched);
     } catch (error: any) {
       res.status(400).json(error.originalError.message);
     }
@@ -140,7 +145,7 @@ projectRouter.put(
         },
       });
       if (empData.length == 0) {
-        res.status(200).json("Employee not found.");
+        res.status(200).json("Employee not found");
       } else {
         /* Check if project exists */
         const projectRepo = req.app.get("appDataSource").getRepository(Project);
@@ -152,7 +157,7 @@ projectRouter.put(
         });
 
         if (projectData.length == 0) {
-          res.status(200).json("Project not found.");
+          res.status(200).json("Project not found");
         } else {
           /* Update */
           let employee: Employee = new Employee();
@@ -182,7 +187,7 @@ projectRouter.put(
         },
       });
       if (empData.length == 0) {
-        res.status(200).json("Employee not found.");
+        res.status(200).json("Employee not found");
       } else {
         /* Check if project exists */
         const projectRepo = req.app.get("appDataSource").getRepository(Project);
@@ -194,7 +199,7 @@ projectRouter.put(
         });
 
         if (projectData.length == 0) {
-          res.status(200).json("Project not found.");
+          res.status(200).json("Project not found");
         } else {
           /* Update */
           let employee: Employee = new Employee();
@@ -233,7 +238,7 @@ projectRouter.put(
         },
       });
       if (empData.length == 0) {
-        res.status(200).json("Employee not found.");
+        res.status(200).json("Employee not found");
       } else {
         /* Check if project exists */
         const projectRepo = req.app.get("appDataSource").getRepository(Project);
@@ -243,7 +248,7 @@ projectRouter.put(
           },
         });
         if (projectData.length == 0) {
-          res.status(200).json("Project not found.");
+          res.status(200).json("Project not found");
         } else {
           /* Update */
           let employee: Employee = new Employee();
@@ -283,7 +288,7 @@ projectRouter.put(
         },
       });
       if (empData.length == 0) {
-        res.status(200).json("Employee not found.");
+        res.status(200).json("Employee not found");
       } else {
         /* Check if project exists */
         const projectRepo = req.app.get("appDataSource").getRepository(Project);
@@ -293,7 +298,7 @@ projectRouter.put(
           },
         });
         if (projectData.length == 0) {
-          res.status(200).json("Project not found.");
+          res.status(200).json("Project not found");
         } else {
           /* Update */
           let employee: Employee = new Employee();

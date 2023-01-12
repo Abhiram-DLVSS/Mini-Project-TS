@@ -10,6 +10,8 @@ Uses MS SQL server
 ## ER Diagram
 <img src='Employee_ER_Diagram.png' width='600'>
 
+Created using [QuickDBD](https://app.quickdatabasediagrams.com/)
+
 ## Routes
 ### Location
 **Add a location**

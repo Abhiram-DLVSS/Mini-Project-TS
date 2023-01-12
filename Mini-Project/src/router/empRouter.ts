@@ -61,7 +61,7 @@ empRouter.post("/", async (req: express.Request, res: express.Response) => {
     employee.name = name as string;
 
     /* Phone Number Validation */
-    const phnoregex = new RegExp("[1-9][0-9]{9}");
+    const phnoregex = new RegExp("^[1-9][0-9]{9,9}$");
     if (!phnoregex.test(phno as string)) {
       res.status(404).json("Invalid Phone Number");
       return;
@@ -293,9 +293,13 @@ empRouter.get(
     const dataFetched = await empdetRepo.find({
       where: {
         salary: Between(lower_bound, upper_bound),
-      },
+      }
     });
-    res.status(200).json(dataFetched);
+    let resarray: any[]=[]
+    for(let i=0;i<dataFetched.length;i++){
+      resarray.push({"id":dataFetched[i].id,"name":dataFetched[i].employee.name,"salary":dataFetched[i].salary})
+    }
+    res.status(200).json(resarray);
   }
 );
 

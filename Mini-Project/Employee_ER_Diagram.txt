@@ -1,0 +1,27 @@
+Employee
+-
+id PK int FK - EmployeeDetails.employeeId
+name UNIQUE nvarchar(255)
+
+
+Project
+-
+id PK int FK >-< Employee.id
+name UNIQUE nvarchar(255)
+
+EmployeeDetails
+-
+id PK int
+experience int
+salary decimal(12,2)
+created_at datetime2(7)
+last_updated datetime2(7)
+phno nvarchar(10)
+locationId int FK >- Location.id
+employeeId int
+
+Location
+-
+id PK int
+name nvarchar(255)
+country nvarchar(255)
