@@ -2,8 +2,10 @@
   "name": "mini-project",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.ts",
+  "main": "src/server.ts",
   "scripts": {
+    "test": "jest --runInBand --coverage",
+    "test:watch": "jest --watch",
     "typeorm": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli",
     "migration:create": "typeorm migration:create migrations/test",
     "migration:run": "npx typeorm-ts-node-commonjs migration:run -d ormconfig.ts",
@@ -22,7 +24,12 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.15",
+    "@types/jest": "^29.2.5",
     "@types/node": "^18.11.18",
+    "@types/supertest": "^2.0.12",
+    "jest": "^29.3.1",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.0.4",
     "ts-node": "^10.9.1"
   }
 }

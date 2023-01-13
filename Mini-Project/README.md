@@ -10,7 +10,7 @@ Uses MS SQL server
 ## ER Diagram
 <img src='Employee_ER_Diagram.png' width='600'>
 
-Created using [QuickDBD](https://app.quickdatabasediagrams.com/)
+Created using [QuickDBD](https://app.quickdatabasediagrams.com/). Diagram source code [here](Employee_ER_Diagram.txt).
 
 ## Routes
 ### Location
@@ -179,4 +179,9 @@ set mig_name=migrationName
 npm run migration:generate
 npm run migration:run
 npm run migration:revert
+```
+
+## Testing
+```bash
+npm run test
 ```

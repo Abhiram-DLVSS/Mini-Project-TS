@@ -124,7 +124,11 @@ empRouter.put("/", async (req: express.Request, res: express.Response) => {
           name: ename,
         },
       });
-      if (empFetched == null) res.status(404).json("Employee not found");
+
+      if (empFetched == null) {
+        res.status(404).json("Employee not found");
+        return
+      }
       else {
         let id = empFetched.id;
         const empdetRepo = req.app
@@ -193,7 +197,7 @@ empRouter.put("/", async (req: express.Request, res: express.Response) => {
 
       if (change_phno != undefined) {
         /* Phone Number Validation */
-        const phnoregex = new RegExp("[1-9][0-9]{9}");
+        const phnoregex = new RegExp("^[1-9][0-9]{9}$");
         if (phnoregex.test(change_phno as string))
           employeeDetails.phno = change_phno as string;
         else {
@@ -212,7 +216,7 @@ empRouter.put("/", async (req: express.Request, res: express.Response) => {
       /* Send the updated record as Response */
       res.status(200).json(dataInserted);
     } else {
-      res.status(404).json("Employee with the given ID not found");
+      res.status(404).json("Employee not found");
     }
   }
 });
@@ -236,14 +240,19 @@ empRouter.get(
       .get("appDataSource")
       .getRepository(EmployeeDetails);
     try {
-      const dataFetched = await empdetRepo.find({
+      const dataFetched = await empdetRepo.findOne({
         where: {
           id: id,
         },
       });
+      if (dataFetched == null){
+        res.status(404).json("Employee not found");
+        return;
+    }
+    else
       res.status(200).json(dataFetched);
     } catch (error: any) {
-      res.status(400).json(error.originalError.message);
+      res.status(400).json(error);
     }
   }
 );
